@@ -17,6 +17,15 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 BLACK = (0, 0, 0)
 
+# بارگذاری فایل‌های صوتی
+player_shoot_sound = pygame.mixer.Sound('sounds/shoot-1-81135.mp3')#شلیک بازیکن
+enemy_shoot_sound = pygame.mixer.Sound('sounds/shoot-6-81136.mp3')#شلیک دشمن
+
+# تنظیم صدای شلیک
+player_shoot_sound.set_volume(0.7)  # مقدار صدا بین 0.0 تا 1.0
+enemy_shoot_sound.set_volume(0.5)   # مقدار صدا بین 0.0 تا 1.0
+
+
 # بارگذاری و تغییر اندازه تصاویر
 def load_and_scale_image(filename, scale_factor):
     image = pygame.image.load(filename)
@@ -25,8 +34,11 @@ def load_and_scale_image(filename, scale_factor):
     return pygame.transform.scale(image, new_size)
 
 
+
+
 player_img = load_and_scale_image('img/survivor-idle_rifle_0.png', 0.4)  # تصویر بازیکن
 bullet_img = load_and_scale_image('img/19.png', 0.4)  # تصویر تیر
+enemy_bullet_img = load_and_scale_image('img/02.png', 0.6)
 enemy_img = load_and_scale_image('img/preview_344.png', 0.4)  # تصویر دشمن
 enemy_img = pygame.transform.rotate(enemy_img, 90)  # چرخش 90 درجه پادساعتگرد
 package_img = load_and_scale_image('img/—Pngtree—crimson first aid box clip_5964434.png', 0.1)  # تصویر بسته، 60 درصد کوچکتر
@@ -101,9 +113,10 @@ def draw_enemies():
 
 def draw_enemy_bullets():
     for bullet in enemy_bullets:
-        bullet_img_rotated = pygame.transform.rotate(bullet_img, bullet['angle'])
+        bullet_img_rotated = pygame.transform.rotate(enemy_bullet_img, bullet['angle'])
         bullet_rect = bullet_img_rotated.get_rect(center=(bullet['pos'][0], bullet['pos'][1]))
         window.blit(bullet_img_rotated, bullet_rect.topleft)
+
 
 def draw_health_bar():
     health_bar_width = 200
@@ -130,6 +143,7 @@ def move_player():
     if keys[pygame.K_s]:
         player_pos[1] += player_speed
 
+
 def shoot_bullet(mouse_pos):
     direction = [mouse_pos[0] - player_pos[0], mouse_pos[1] - player_pos[1]]
     distance = math.hypot(direction[0], direction[1])
@@ -139,6 +153,10 @@ def shoot_bullet(mouse_pos):
     angle = math.degrees(math.atan2(direction[1], direction[0]))
     bullets.append({'pos': bullet_pos, 'dir': direction, 'angle': -angle})
 
+    # پخش صدای شلیک بازیکن
+    player_shoot_sound.play()
+
+
 def shoot_enemy_bullet(enemy):
     direction = [player_pos[0] - enemy['pos'][0], player_pos[1] - enemy['pos'][1]]
     distance = math.hypot(direction[0], direction[1])
@@ -147,6 +165,10 @@ def shoot_enemy_bullet(enemy):
     bullet_pos = [enemy['pos'][0], enemy['pos'][1]]
     angle = math.degrees(math.atan2(direction[1], direction[0]))
     enemy_bullets.append({'pos': bullet_pos, 'dir': direction, 'angle': -angle})
+
+    # پخش صدای شلیک دشمن
+    enemy_shoot_sound.play()
+
 
 def update_bullets():
     global bullets
